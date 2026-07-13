@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Upload Document - KMRL DMS{% endblock %}
+{% block page_title %}Upload Document{% endblock %}
+{% block content %}
+
+<div class="dashboard-card form-card">
+    <h5><i class="bi bi-cloud-upload-fill"></i> Upload a New Document</h5>
+    <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data" id="uploadForm">
+        <div class="row">
+            <div class="col-md-8 mb-3">
+                <label class="form-label">Document Title *</label>
+                <input type="text" class="form-control" name="title" required>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Version</label>
+                <input type="text" class="form-control" name="version" value="1.0">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="description" rows="3" placeholder="Brief description of the document"></textarea>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Department *</label>
+                <select class="form-select" name="department" required>
+                    <option value="" selected disabled>Select Department</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Category *</label>
+                <select class="form-select" name="category" required>
+                    <option value="" selected disabled>Select Category</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tags <small class="text-muted">(comma separated)</small></label>
+            <input type="text" class="form-control" name="tags" placeholder="e.g. safety, circular, 2026">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Select File *</label>
+            <input type="file" class="form-control" name="document_file" id="fileInput" required
+                   accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif">
+            <small class="text-muted">Allowed: PDF, Word, Excel, Images (Max 25MB)</small>
+        </div>
+
+        <div class="upload-drop-info" id="fileInfo"></div>
+
+        <button type="submit" class="btn btn-primary"><i class="bi bi-upload"></i> Upload Document</button>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('fileInput').addEventListener('change', function(e){
+    const info = document.getElementById('fileInfo');
+    if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        const sizeKB = (file.size / 1024).toFixed(1);
+        info.innerHTML = `<i class="bi bi-file-earmark-check-fill"></i> ${file.name} (${sizeKB} KB)`;
+    } else {
+        info.innerHTML = '';
+    }
+});
+
+document.getElementById('uploadForm').addEventListener('submit', function(e){
+    const title = document.querySelector('input[name="title"]').value.trim();
+    const dept = document.querySelector('select[name="department"]').value;
+    const cat = document.querySelector('select[name="category"]').value;
+    if (!title || !dept || !cat) {
+        e.preventDefault();
+        showToast('Please fill all required fields before uploading.', 'danger');
+    }
+});
+</script>
+{% endblock %}

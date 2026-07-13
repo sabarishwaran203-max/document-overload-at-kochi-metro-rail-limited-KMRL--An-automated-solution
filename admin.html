@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel - KMRL DMS{% endblock %}
+{% block page_title %}Admin Panel{% endblock %}
+{% block content %}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card gradient-blue">
+            <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-info"><h2>{{ total_users }}</h2><p>Total Users</p></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card gradient-green">
+            <div class="stat-icon"><i class="bi bi-files"></i></div>
+            <div class="stat-info"><h2>{{ total_documents }}</h2><p>Total Documents</p></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card gradient-orange">
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-info"><h2>{{ pending_count }}</h2><p>Pending Approvals</p></div>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs admin-tabs" role="tablist">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#usersTab">Users</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#docsTab">Documents</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#auditTab">Audit Log</button></li>
+</ul>
+
+<div class="tab-content dashboard-card">
+
+    <div class="tab-pane fade show active" id="usersTab">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead><tr><th>Employee ID</th><th>Name</th><th>Email</th><th>Department</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>{{ u.employee_id }}</td>
+                        <td>{{ u.name }}</td>
+                        <td>{{ u.email }}</td>
+                        <td>{{ u.department }}</td>
+                        <td>{{ u.role }}</td>
+                        <td><span class="status-badge status-{{ u.status|lower }}">{{ u.status }}</span></td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                {% if u.status != 'Approved' %}
+                                <form action="{{ url_for('approve_user', user_id=u.id) }}" method="POST">
+                                    <button class="btn btn-sm btn-outline-success" title="Approve"><i class="bi bi-check-lg"></i></button>
+                                </form>
+                                {% endif %}
+                                {% if u.role != 'Admin' %}
+                                <form action="{{ url_for('make_admin', user_id=u.id) }}" method="POST">
+                                    <button class="btn btn-sm btn-outline-primary" title="Make Admin"><i class="bi bi-shield-fill"></i></button>
+                                </form>
+                                {% endif %}
+                                <form action="{{ url_for('delete_user', user_id=u.id) }}" method="POST" class="delete-form">
+                                    <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="docsTab">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead><tr><th>Title</th><th>Department</th><th>Category</th><th>Uploaded By</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td>{{ doc.title }}</td>
+                        <td>{{ doc.department }}</td>
+                        <td>{{ doc.category }}</td>
+                        <td>{{ doc.uploaded_by }}</td>
+                        <td><span class="status-badge status-{{ doc.status|lower }}">{{ doc.status }}</span></td>
+                        <td>{{ doc.upload_date }}</td>
+                        <td>
+                            <a href="{{ url_for('document_details', doc_id=doc.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                            <form action="{{ url_for('delete_document', doc_id=doc.id) }}" method="POST" class="delete-form d-inline">
+                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="auditTab">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead><tr><th>Action</th><th>User</th><th>Document</th><th>Timestamp</th></tr></thead>
+                <tbody>
+                    {% for log in audit_logs %}
+                    <tr>
+                        <td>{{ log.action }}</td>
+                        <td>{{ log.username }}</td>
+                        <td>{{ log.document }}</td>
+                        <td>{{ log.timestamp }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="text-center text-muted">No audit records yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
