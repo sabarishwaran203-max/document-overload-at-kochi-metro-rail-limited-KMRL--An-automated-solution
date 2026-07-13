@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}KMRL Document System{% endblock %}</title>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Custom CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% if session.user_id %}
+<div class="app-wrapper">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-train-front-fill"></i>
+            <span>KMRL DMS</span>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint=='dashboard' }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('upload') }}" class="{{ 'active' if request.endpoint=='upload' }}"><i class="bi bi-cloud-upload-fill"></i> Upload Document</a></li>
+            <li><a href="{{ url_for('documents') }}" class="{{ 'active' if request.endpoint=='documents' }}"><i class="bi bi-folder-fill"></i> All Documents</a></li>
+            <li><a href="{{ url_for('search') }}" class="{{ 'active' if request.endpoint=='search' }}"><i class="bi bi-search"></i> Search</a></li>
+            <li><a href="{{ url_for('reports') }}" class="{{ 'active' if request.endpoint=='reports' }}"><i class="bi bi-bar-chart-fill"></i> Reports</a></li>
+            <li><a href="{{ url_for('profile') }}" class="{{ 'active' if request.endpoint=='profile' }}"><i class="bi bi-person-circle"></i> My Profile</a></li>
+            {% if session.role == 'Admin' %}
+            <li><a href="{{ url_for('admin') }}" class="{{ 'active' if request.endpoint=='admin' }}"><i class="bi bi-shield-lock-fill"></i> Admin Panel</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <!-- Top navbar -->
+        <nav class="topnavbar">
+            <button class="btn-toggle" id="sidebarToggle"><i class="bi bi-list"></i></button>
+            <div class="navbar-title">
+                <h5>{% block page_title %}Dashboard{% endblock %}</h5>
+                <small>Kochi Metro Rail Limited &mdash; Document Management System</small>
+            </div>
+            <div class="navbar-user">
+                <div class="user-info">
+                    <span class="user-name">{{ session.name }}</span>
+                    <span class="user-role badge-role">{{ session.role }}</span>
+                </div>
+                <div class="user-avatar">{{ session.name[0]|upper }}</div>
+            </div>
+        </nav>
+
+        <div class="page-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+{% else %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="auth-flash-container">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    {% block auth_content %}{% endblock %}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

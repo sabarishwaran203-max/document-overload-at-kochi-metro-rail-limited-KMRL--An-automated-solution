@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Register - KMRL DMS{% endblock %}
+{% block auth_content %}
+<div class="auth-page">
+    <div class="auth-card auth-card-wide">
+        <div class="auth-brand">
+            <i class="bi bi-train-front-fill"></i>
+            <h3>Create Account</h3>
+            <p>Register to access the KMRL Document Management System</p>
+        </div>
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Employee ID</label>
+                    <input type="text" class="form-control" name="employee_id" placeholder="e.g. EMP1023" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" name="name" placeholder="Full Name" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" name="email" placeholder="name@kmrl.co.in" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Department</label>
+                    <select class="form-select" name="department" required>
+                        <option value="" selected disabled>Select Department</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept }}">{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" name="role" required>
+                        <option value="Employee" selected>Employee</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" name="password" placeholder="Minimum 6 characters" required minlength="6">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" name="confirm_password" placeholder="Re-enter password" required minlength="6">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 btn-auth">
+                <i class="bi bi-person-plus-fill"></i> Register
+            </button>
+        </form>
+        <p class="auth-footer">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+    </div>
+</div>
+{% endblock %}
